@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="irkit_a">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/app/libs/irkit_a.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

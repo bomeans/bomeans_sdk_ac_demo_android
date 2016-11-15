@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="irnaticecore">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/app/libs/irnaticecore.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
