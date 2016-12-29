@@ -1,11 +1,16 @@
 package com.bomeans.sample.acremotesample;
 
 import android.app.Activity;
-import android.support.v7.app.AppCompatActivity;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ScrollView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bomeans.IRKit.BIRKeyOption;
@@ -57,43 +62,70 @@ public class MainActivity extends AppCompatActivity {
     Button mVerticalAirSwingButton;
     Button mHorizontalAirSwingButton;
     // others
-    ScrollView mScrollView;
+    LinearLayout mExtraKeyLayout;
+    ProgressBar mProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // initialize IRKit
-        IRKit.setup(API_KEY, getApplicationContext());  // use application context
+        // check API Key
+        if (API_KEY == null || API_KEY.isEmpty()) {
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("Invalid API Key!")
+                    .setMessage("No valid API key is assigned!\n\nTo apply an API key:\nhttp://www.bomeans.com/Mainpage/Apply/apikey")
+                    .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            MainActivity.this.finish();
+                        }
+                    })
+                    .setNegativeButton("Apply Now", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.bomeans.com/Mainpage/Apply/apikey"));
+                            startActivity(browserIntent);
+                            MainActivity.this.finish();
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setCancelable(false)
+                    .show();
+        } else {
 
-        // setup the IR Blaster, write your own IR Blaster code by creating a class implements BIRIrHW or BIRIRBlaster
-        // BIRIrHW is for general IR waveform data format, BIRIRBlaster is for special format suitable for Bomeans IR Blaster MCU.
-        MyIrBlaster myIrBlaster = new MyIrBlaster(this);
-        IRKit.setIRHW(myIrBlaster);
+            // initialize IRKit
+            IRKit.setup(API_KEY, getApplicationContext());  // use application context
 
-        // create remote controller
-        createRemoteController();
+            // setup the IR Blaster, write your own IR Blaster code by creating a class implements BIRIrHW or BIRIRBlaster
+            // BIRIrHW is for general IR waveform data format, BIRIRBlaster is for special format suitable for Bomeans IR Blaster MCU.
+            MyIrBlaster myIrBlaster = new MyIrBlaster(this);
+            IRKit.setIRHW(myIrBlaster);
 
-        mCurrentPowerText = (TextView) findViewById(R.id.current_power);
-        mPowerButton = (Button) findViewById(R.id.button_power);
+            // create remote controller
+            createRemoteController();
 
-        mCurrentTempText = (TextView) findViewById(R.id.current_temp);
-        mTempUpButton = (Button) findViewById(R.id.button_temp_up);
-        mTempDownButton = (Button) findViewById(R.id.button_temp_down);
+            mCurrentPowerText = (TextView) findViewById(R.id.current_power);
+            mPowerButton = (Button) findViewById(R.id.button_power);
 
-        mCurrentModeText = (TextView) findViewById(R.id.current_mode);
-        mModeButton = (Button) findViewById(R.id.button_mode);
+            mCurrentTempText = (TextView) findViewById(R.id.current_temp);
+            mTempUpButton = (Button) findViewById(R.id.button_temp_up);
+            mTempDownButton = (Button) findViewById(R.id.button_temp_down);
 
-        mCurrentFanSpeedText = (TextView) findViewById(R.id.current_fan_speed);
-        mFanSpeedButton = (Button) findViewById(R.id.button_fanspeed);
+            mCurrentModeText = (TextView) findViewById(R.id.current_mode);
+            mModeButton = (Button) findViewById(R.id.button_mode);
 
-        mCurrentVerticalAirSwingText = (TextView) findViewById(R.id.current_air_ud);
-        mVerticalAirSwingButton = (Button) findViewById(R.id.button_air_ud);
-        mCurrentHorizontalAirSwingText = (TextView) findViewById(R.id.current_air_lr);
-        mHorizontalAirSwingButton = (Button) findViewById(R.id.button_air_lr);
+            mCurrentFanSpeedText = (TextView) findViewById(R.id.current_fan_speed);
+            mFanSpeedButton = (Button) findViewById(R.id.button_fanspeed);
 
-        mScrollView = (ScrollView) findViewById(R.id.scroll_view);
+            mCurrentVerticalAirSwingText = (TextView) findViewById(R.id.current_air_ud);
+            mVerticalAirSwingButton = (Button) findViewById(R.id.button_air_ud);
+            mCurrentHorizontalAirSwingText = (TextView) findViewById(R.id.current_air_lr);
+            mHorizontalAirSwingButton = (Button) findViewById(R.id.button_air_lr);
+
+            mExtraKeyLayout = (LinearLayout) findViewById(R.id.extend_keys);
+            mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        }
+
     }
 
     private void createRemoteController() {
@@ -132,8 +164,21 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             createMyGUI();
+                            mProgressBar.setVisibility(View.GONE);
                         }
                     });
+                } else {
+                    new AlertDialog.Builder(MainActivity.this)
+                            .setTitle("Server Access Error!")
+                            .setMessage("Failed to retrieve data from the server!")
+                            .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    MainActivity.this.finish();
+                                }
+                            })
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setCancelable(false)
+                            .show();
                 }
             }
 
@@ -153,8 +198,6 @@ public class MainActivity extends AppCompatActivity {
         if (null == mMyAcRemote) {
             return;
         }
-
-        updateGUI();
 
         String[] allSupportedKeys = mMyAcRemote.getAllKeys();
 
@@ -292,9 +335,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         createNonFixedKeysGUI(allSupportedKeys);
+
+        updateGUI();
     }
 
     private void createNonFixedKeysGUI(String[] keyIDs) {
+
+        mExtraKeyLayout.removeAllViews();
 
         // handle all the "extension keys" here.
         // extension keys are those not in common keys of remote controllers.
@@ -311,7 +358,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-            mScrollView.addView(button);
+            mExtraKeyLayout.addView(button);
         }
     }
 
@@ -423,9 +470,9 @@ public class MainActivity extends AppCompatActivity {
             mCurrentVerticalAirSwingText.setVisibility(isOn ? View.VISIBLE : View.INVISIBLE);
             mVerticalAirSwingButton.setEnabled(mHasVerticalAirSwingKey ? isOn : false);
 
-            /*for (int i = 0; i < mScrollView.getChildCount(); i++) {
-                mScrollView.getChildAt(i).setEnabled(isOn);
-            }*/
+            for (int i = 0; i < mExtraKeyLayout.getChildCount(); i++) {
+                mExtraKeyLayout.getChildAt(i).setEnabled(isOn);
+            }
         }
     }
 
