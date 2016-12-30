@@ -1,3 +1,5 @@
+(The contents of this repo has been merged into bomeans_sdk_irapi repo)
+
 # bomeans_sdk_ac_demo_android
 This demo program demonstrates how make your GUI to interact with the Bomeans IR SDK.
 
