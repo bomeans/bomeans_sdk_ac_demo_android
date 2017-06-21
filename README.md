@@ -8,3 +8,5 @@ Remote controllers of air conditioners act very different from general TV remote
 The Bomeans IR database and the associated SDK is then design to handle this situation in order to allow the user to create remote controllers that behave just like the real remote controller.
 
 [Note] You need to apply an Bomeans IR API Key for this demo code to run.
+
+<img src="screenshot.jpg" width="400">
