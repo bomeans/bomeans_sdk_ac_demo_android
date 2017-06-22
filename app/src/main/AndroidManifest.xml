@@ -19,6 +19,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".AcDemo2Activity" />
+        <activity android:name=".AcDemo1Activity" />
+        <activity android:name=".AcDemo3Activity" />
     </application>
 
 </manifest>

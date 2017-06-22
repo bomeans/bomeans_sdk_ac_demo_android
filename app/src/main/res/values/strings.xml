@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ACRemoteSample</string>
+    <string name="title_activity_ac_demo2">AcDemo2Activity</string>
 </resources>

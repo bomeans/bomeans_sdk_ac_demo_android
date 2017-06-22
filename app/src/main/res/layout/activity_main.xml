@@ -11,144 +11,23 @@
     android:orientation="vertical"
     tools:context="com.bomeans.sample.acremotesample.MainActivity">
 
-    <ProgressBar
-        android:id="@+id/progress_bar"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:text="AC Remote Demo" />
-
-    <!-- power key -->
-    <LinearLayout
+    <Button
+        android:id="@+id/button_demo1"
+        android:text="Demo 1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content" />
 
-        <Button
-            android:id="@+id/button_power"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Power"/>
-        <TextView
-            android:id="@+id/current_power"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="30dp"
-            android:text=""/>
-    </LinearLayout>
-
-    <!-- mode key -->
-    <LinearLayout
+    <Button
+        android:id="@+id/button_demo2"
+        android:text="Demo 2"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content" />
 
-        <Button
-            android:id="@+id/button_mode"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Mode"/>
-        <TextView
-            android:id="@+id/current_mode"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="30dp"
-            android:text=""/>
-    </LinearLayout>
-
-    <!-- temperature key -->
-    <LinearLayout
+    <Button
+        android:id="@+id/button_demo3"
+        android:text="Demo 3"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content" />
 
-        <Button
-            android:id="@+id/button_temp_up"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Temp+"/>
-        <Button
-            android:id="@+id/button_temp_down"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Temp-"/>
-        <TextView
-            android:id="@+id/current_temp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="30dp"
-            android:text=""/>
-    </LinearLayout>
-
-    <!-- fan speed key -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/button_fanspeed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Fan"/>
-        <TextView
-            android:id="@+id/current_fan_speed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="30dp"
-            android:text=""/>
-    </LinearLayout>
-
-    <!-- air-swing -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <Button
-            android:id="@+id/button_air_ud"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Air Swing (Vertical)" />
-        <TextView
-            android:id="@+id/current_air_ud"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="30dp"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <Button
-            android:id="@+id/button_air_lr"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Air Swing (Horizontal)" />
-        <TextView
-            android:id="@+id/current_air_lr"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="30dp"/>
-    </LinearLayout>
-
-    <!-- all other keys are here -->
-    <ScrollView
-        android:id="@+id/scroll_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <LinearLayout
-            android:id="@+id/extend_keys"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"></LinearLayout>
-
-    </ScrollView>
 
 </LinearLayout>
