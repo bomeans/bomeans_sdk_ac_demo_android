@@ -14,6 +14,30 @@ import java.util.ArrayList;
  * Some users prefer having the traditional TEMP UP/DOWN button instead of setting the temperature
  * directly. Just wrap the original BIRRemote in this class you will get TEMP_UP/DOWN keys instead
  * of a signal TEMP key.
+ *
+ * Usage:
+ * When creating a AC remote:
+ *
+ * IRKit.createRemote(typeId, brandId, modelId, getNew, new IRemoteCreateCallBack() {
+ *
+ *  @Override
+ *  public void onCreateResult(Object remoteController, int resultCode) {
+ *      if (resultCode == ConstValue.BIRNoError) {
+ *          mMyAcRemote = new BIRAcRemote((BIRRemote) remoteController);
+ *          // do other controlling
+ *      });
+ *      } else {
+ *          // error handling
+ *      }
+ *  }
+ *
+ *  @Override
+ *  public void onPreCreate() { }
+ *
+ *  @Override
+ *  public void onProgressUpdate(Integer... integers) { }
+ * });
+ *
  */
 public class BIRAcRemote implements BIRRemote {
 
