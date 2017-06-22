@@ -25,7 +25,6 @@ import java.util.ArrayList;
  *      if (resultCode == ConstValue.BIRNoError) {
  *          mMyAcRemote = new BIRAcRemote((BIRRemote) remoteController);
  *          // do other controlling
- *      });
  *      } else {
  *          // error handling
  *      }
