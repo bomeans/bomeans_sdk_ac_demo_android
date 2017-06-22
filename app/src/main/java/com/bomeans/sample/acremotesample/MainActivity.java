@@ -21,7 +21,7 @@ import com.bomeans.IRKit.IRKit;
 public class MainActivity extends AppCompatActivity {
 
     // apply an SDK key from Bomeans and apply it below
-    private String API_KEY = "paste-your-api-key-here";
+    private String API_KEY = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
