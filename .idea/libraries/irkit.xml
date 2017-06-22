@@ -1,7 +1,7 @@
 <component name="libraryTable">
-  <library name="irkit_a">
+  <library name="irkit">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/app/libs/irkit_a.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/libs/irkit.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

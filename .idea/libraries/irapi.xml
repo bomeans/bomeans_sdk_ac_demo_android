@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="irapi">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/app/libs/irapi.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
