@@ -120,28 +120,38 @@ public class BIRAcRemote implements BIRRemote {
 
         if (mConvertTempKey) {
             if (keyId.equalsIgnoreCase(IR_ACKEY_TEMP_DOWN)) {
-                // handling the temp down
-                // get the current temp
-                BIRKeyOption currentKeyOptions = mBirRemote.getKeyOption(IR_ACKEY_TEMP);
-                String nextTempOptionId;
-                if (currentKeyOptions.currentOption > 0) {  // not yet reach the front
-                    nextTempOptionId = currentKeyOptions.options[currentKeyOptions.currentOption - 1];
+
+                if (optionId != null) {
+                    return mBirRemote.transmitIR(IR_ACKEY_TEMP, optionId);
                 } else {
-                    nextTempOptionId = currentKeyOptions.options[0];
+                    // handling the temp down
+                    // get the current temp
+                    BIRKeyOption currentKeyOptions = mBirRemote.getKeyOption(IR_ACKEY_TEMP);
+                    String nextTempOptionId;
+                    if (currentKeyOptions.currentOption > 0) {  // not yet reach the front
+                        nextTempOptionId = currentKeyOptions.options[currentKeyOptions.currentOption - 1];
+                    } else {
+                        nextTempOptionId = currentKeyOptions.options[0];
+                    }
+                    return mBirRemote.transmitIR(IR_ACKEY_TEMP, nextTempOptionId);
                 }
-                return mBirRemote.transmitIR(IR_ACKEY_TEMP, nextTempOptionId);
 
             } else if (keyId.equalsIgnoreCase(IR_ACKEY_TEMP_UP)) {
-                // handling the temp up: just call the original temp key (which is temp up)
-                // get the current temp
-                BIRKeyOption currentKeyOptions = mBirRemote.getKeyOption(IR_ACKEY_TEMP);
-                String nextTempOptionId;
-                if (currentKeyOptions.currentOption < currentKeyOptions.options.length - 1) {  // not yet reach the end
-                    nextTempOptionId = currentKeyOptions.options[currentKeyOptions.currentOption + 1];
+                
+                if (optionId != null) {
+                    return mBirRemote.transmitIR(IR_ACKEY_TEMP, optionId);
                 } else {
-                    nextTempOptionId = currentKeyOptions.options[currentKeyOptions.options.length - 1];
+                    // handling the temp up: just call the original temp key (which is temp up)
+                    // get the current temp
+                    BIRKeyOption currentKeyOptions = mBirRemote.getKeyOption(IR_ACKEY_TEMP);
+                    String nextTempOptionId;
+                    if (currentKeyOptions.currentOption < currentKeyOptions.options.length - 1) {  // not yet reach the end
+                        nextTempOptionId = currentKeyOptions.options[currentKeyOptions.currentOption + 1];
+                    } else {
+                        nextTempOptionId = currentKeyOptions.options[currentKeyOptions.options.length - 1];
+                    }
+                    return mBirRemote.transmitIR(IR_ACKEY_TEMP, nextTempOptionId);
                 }
-                return mBirRemote.transmitIR(IR_ACKEY_TEMP, nextTempOptionId);
             } else {
 
                 // for all other keys, just relay to the original function
