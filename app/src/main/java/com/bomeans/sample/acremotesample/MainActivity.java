@@ -86,7 +86,30 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
             });
-
+            Button IRbuttonDemo1 = (Button)findViewById(R.id.irapi_button_demo1);
+            IRbuttonDemo1.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(MainActivity.this, IRAcDemo1Activity.class);
+                    startActivity(intent);
+                }
+            });
+            Button IRbuttonDemo2 = (Button)findViewById(R.id.irapi_button_demo2);
+            IRbuttonDemo2.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(MainActivity.this, IRAcDemo2Activity.class);
+                    startActivity(intent);
+                }
+            });
+            Button IRbuttonDemo3 = (Button)findViewById(R.id.irapi_button_demo3);
+            IRbuttonDemo3.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(MainActivity.this, IRAcDemo3Activity.class);
+                    startActivity(intent);
+                }
+            });
         }
 
     }

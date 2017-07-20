@@ -2,14 +2,15 @@ package com.bomeans.sample.acremotesample;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.bomeans.IRKit.BIRKeyOption;
@@ -17,17 +18,20 @@ import com.bomeans.IRKit.BIRRemote;
 import com.bomeans.IRKit.ConstValue;
 import com.bomeans.IRKit.IRKit;
 import com.bomeans.IRKit.IRemoteCreateCallBack;
+import com.bomeans.irapi.ACKeyOptions;
+import com.bomeans.irapi.ICreateRemoteCallback;
+import com.bomeans.irapi.IIRRemote;
+import com.bomeans.irapi.IRAPI;
+import com.bomeans.irapi.IRRemote;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This demo is the same as demo1 except the created BIRRemote is wrapped in BIRAcRemote.
- * BIRAcRemote replaces the IR_ACKEY_TEMP with _TEMP_UP / _TEMP_DOWN keys.
+ * Created by admin on 2017/7/20.
  */
-public class AcDemo2Activity extends AppCompatActivity {
-
-    private BIRAcRemote mMyAcRemote = null;
+public class IRAcDemo3Activity extends AppCompatActivity{
+    private IIRRemote mMyAcRemote = null;
 
     // GUI: fixed buttons (common for most air-conditioners)
     // These are most common keys for AC remote controllers.
@@ -36,11 +40,9 @@ public class AcDemo2Activity extends AppCompatActivity {
     TextView mCurrentPowerText;
     Button mPowerButton;
     // temp +/-
-    Boolean mHasTemperatureUpKey = true;
-    Boolean mHasTemperatureDownKey = true;
+    Boolean mHasTemperatureKey = true;
     TextView mCurrentTempText;
-    Button mTempUpButton;
-    Button mTempDownButton;
+    SeekBar mTempBar;
     // mode
     Boolean mHasModeKey = true;
     TextView mCurrentModeText;
@@ -60,12 +62,14 @@ public class AcDemo2Activity extends AppCompatActivity {
     LinearLayout mExtraKeyLayout;
     ProgressBar mProgressBar;
 
+    int mMinTemp;
+    int mMaxTemp;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_ac_demo1);
-
-        // add back arrow to toolbar
+        setContentView(R.layout.activity_ac_demo3);
+// add back arrow to toolbar
         if (getSupportActionBar() != null){
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -78,8 +82,7 @@ public class AcDemo2Activity extends AppCompatActivity {
         mPowerButton = (Button) findViewById(R.id.button_power);
 
         mCurrentTempText = (TextView) findViewById(R.id.current_temp);
-        mTempUpButton = (Button) findViewById(R.id.button_temp_up);
-        mTempDownButton = (Button) findViewById(R.id.button_temp_down);
+        mTempBar = (SeekBar) findViewById(R.id.seekbar_temp);
 
         mCurrentModeText = (TextView) findViewById(R.id.current_mode);
         mModeButton = (Button) findViewById(R.id.button_mode);
@@ -95,7 +98,6 @@ public class AcDemo2Activity extends AppCompatActivity {
         mExtraKeyLayout = (LinearLayout) findViewById(R.id.extend_keys);
         mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
     }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // handle arrow click here
@@ -124,34 +126,34 @@ public class AcDemo2Activity extends AppCompatActivity {
         //String modelId = "PANASONIC-A75C2044";
 
         final Activity thisActivity = this;
-
-        IRKit.createRemote(
+        IRAPI.createRemote(
                 typeId,
                 brandId,
                 modelId,
                 true, //always re-download from cloud, or false if using cached data
-                new IRemoteCreateCallBack() {
+                new ICreateRemoteCallback() {
+                    @Override
+                    public void onRemoteCreated(IRRemote irRemote) {
+                        mMyAcRemote = (IIRRemote) irRemote;
 
+                        thisActivity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                createMyGUI();
+                                mProgressBar.setVisibility(View.GONE);
+                            }
+                        });
+                    }
 
                     @Override
-                    public void onCreateResult(Object remoteController, int resultCode) {
-                        if (resultCode == ConstValue.BIRNoError) {
-                            mMyAcRemote = new BIRAcRemote((BIRRemote) remoteController);
-
-                            thisActivity.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    createMyGUI();
-                                    mProgressBar.setVisibility(View.GONE);
-                                }
-                            });
-                        } else {
-                            new AlertDialog.Builder(AcDemo2Activity.this)
+                    public void onError(int i) {
+                        if (i != ConstValue.BIRNoError) {
+                            new AlertDialog.Builder(IRAcDemo3Activity.this)
                                     .setTitle("Server Access Error!")
                                     .setMessage("Failed to retrieve data from the server!")
                                     .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int which) {
-                                            AcDemo2Activity.this.finish();
+                                            IRAcDemo3Activity.this.finish();
                                         }
                                     })
                                     .setIcon(android.R.drawable.ic_dialog_alert)
@@ -159,17 +161,8 @@ public class AcDemo2Activity extends AppCompatActivity {
                                     .show();
                         }
                     }
-
-                    @Override
-                    public void onPreCreate() {
-
-                    }
-
-                    @Override
-                    public void onProgressUpdate(Integer... integers) {
-
-                    }
                 });
+
     }
 
     private void createMyGUI() {
@@ -177,7 +170,7 @@ public class AcDemo2Activity extends AppCompatActivity {
             return;
         }
 
-        String[] allSupportedKeys = mMyAcRemote.getAllKeys();
+        String[] allSupportedKeys = mMyAcRemote.getKeyList();
 
         // power key
         if (containString("IR_ACKEY_POWER", allSupportedKeys)) {
@@ -200,44 +193,50 @@ public class AcDemo2Activity extends AppCompatActivity {
             mPowerButton.setEnabled(false);
         }
 
-        // do we have temp up key?
-        if (containString("IR_ACKEY_TEMP_UP", allSupportedKeys)) {
-            allSupportedKeys = removeString("IR_ACKEY_TEMP_UP", allSupportedKeys);
-            mTempUpButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (null != mMyAcRemote) {
+        // do we have temp key?
+        if (containString("IR_ACKEY_TEMP", allSupportedKeys)) {
+            allSupportedKeys = removeString("IR_ACKEY_TEMP", allSupportedKeys);
 
-                        mMyAcRemote.transmitIR("IR_ACKEY_TEMP_UP", null);
+            ACKeyOptions tempKeyOptions = mMyAcRemote.acGetKeyOption("IR_ACKEY_TEMP");
+            // get the min/max temp
+            final int minTemp = 100;
+            int maxTemp = -100;
+            for (String optionId : tempKeyOptions.options) {
+                extractTempStringFromOptionString(optionId);
+            }
+
+            mTempBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                    // we just update the display, not transmitting the IR
+                    int newTempIndex = mTempBar.getProgress();
+                    mCurrentTempText.setText(String.format("%d", newTempIndex + mMinTemp));
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    int newTempIndex = mTempBar.getProgress();
+                    ACKeyOptions currentKeyOptions = mMyAcRemote.acGetKeyOption("IR_ACKEY_TEMP");
+                    if (newTempIndex < currentKeyOptions.options.length) {
+                        String newOptionId = currentKeyOptions.options[newTempIndex];
+                        mMyAcRemote.transmitIR("IR_ACKEY_TEMP", newOptionId);
 
                         // update GUI
                         updateGUI();
                     }
                 }
             });
+
         } else {
-            mHasTemperatureUpKey = false;
-            mTempUpButton.setEnabled(false);
-        }
-
-        // do we have temp down key?
-        if (containString("IR_ACKEY_TEMP_DOWN", allSupportedKeys)) {
-            allSupportedKeys = removeString("IR_ACKEY_TEMP_DOWN", allSupportedKeys);
-            mTempDownButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (null != mMyAcRemote) {
-
-                        mMyAcRemote.transmitIR("IR_ACKEY_TEMP_DOWN", null);
-
-                        // update GUI
-                        updateGUI();
-                    }
-                }
-            });
-        } else {
-            mHasTemperatureDownKey = false;
-            mTempDownButton.setEnabled(false);
+            mHasTemperatureKey = false;
+            mTempBar.setEnabled(false);
         }
 
         if (containString("IR_ACKEY_MODE", allSupportedKeys)) {
@@ -342,39 +341,39 @@ public class AcDemo2Activity extends AppCompatActivity {
 
     private void updateGUI() {
 
-        String[] allSupportedKeys = mMyAcRemote.getAllKeys();
+        String[] allSupportedKeys = mMyAcRemote.getKeyList();
 
         // power
         if (containString("IR_ACKEY_POWER", allSupportedKeys)) {
-            BIRKeyOption newKeyOptions = mMyAcRemote.getKeyOption("IR_ACKEY_POWER");
+            ACKeyOptions newKeyOptions = mMyAcRemote.acGetKeyOption("IR_ACKEY_POWER");
             showPowerText(newKeyOptions.options[newKeyOptions.currentOption]);
         }
 
         // temp
-        if (containString("IR_ACKEY_TEMP_UP", allSupportedKeys)) {
-            BIRKeyOption newKeyOptions = mMyAcRemote.getKeyOption("IR_ACKEY_TEMP_UP");
-            showTempText(newKeyOptions.options[newKeyOptions.currentOption]);
+        if (containString("IR_ACKEY_TEMP", allSupportedKeys)) {
+            ACKeyOptions newKeyOptions = mMyAcRemote.acGetKeyOption("IR_ACKEY_TEMP");
+            updateTempGUI(newKeyOptions);
         }
 
         // mode
         if (containString("IR_ACKEY_MODE", allSupportedKeys)) {
-            BIRKeyOption newKeyOptions = mMyAcRemote.getKeyOption("IR_ACKEY_MODE");
+            ACKeyOptions newKeyOptions = mMyAcRemote.acGetKeyOption("IR_ACKEY_MODE");
             showModeText(newKeyOptions.options[newKeyOptions.currentOption]);
         }
 
         // fanspeed
         if (containString("IR_ACKEY_FANSPEED", allSupportedKeys)) {
-            BIRKeyOption newKeyOptions = mMyAcRemote.getKeyOption("IR_ACKEY_FANSPEED");
+            ACKeyOptions newKeyOptions = mMyAcRemote.acGetKeyOption("IR_ACKEY_FANSPEED");
             showFanSpeedText(newKeyOptions.options[newKeyOptions.currentOption]);
         }
 
         // air-swing
         if (containString("IR_ACKEY_AIRSWING_LR", allSupportedKeys)) {
-            BIRKeyOption newKeyOptions = mMyAcRemote.getKeyOption("IR_ACKEY_AIRSWING_LR");
+            ACKeyOptions newKeyOptions = mMyAcRemote.acGetKeyOption("IR_ACKEY_AIRSWING_LR");
             showAirSwingText(newKeyOptions.options[newKeyOptions.currentOption]);
         }
         if (containString("IR_ACKEY_AIRSWING_UD", allSupportedKeys)) {
-            BIRKeyOption newKeyOptions = mMyAcRemote.getKeyOption("IR_ACKEY_AIRSWING_UD");
+            ACKeyOptions newKeyOptions = mMyAcRemote.acGetKeyOption("IR_ACKEY_AIRSWING_UD");
             showAirSwingText(newKeyOptions.options[newKeyOptions.currentOption]);
         }
     }
@@ -402,18 +401,18 @@ public class AcDemo2Activity extends AppCompatActivity {
             mCurrentPowerText.setText(powerString);
 
             Boolean isOn = true;
-            if (mMyAcRemote.getGuiFeature() != null) {
-                switch (mMyAcRemote.getGuiFeature().displayType) {
-                    case ConstValue.BIRGuiDisplayType_YES:  // has normal display (display on when power on, off when power off
+            if (mMyAcRemote.acGetGuiFeatures() != null) {
+                switch (mMyAcRemote.acGetGuiFeatures().displayMode) {
+                    case ValidWhilePoweredOn:  // has normal display (display on when power on, off when power off
                         isOn = powerString.equalsIgnoreCase("ON");
                         break;
 
-                    case ConstValue.BIRGuiDisplayType_NO:   // no display
+                    case NoDisplay:   // no display
                         // this type of remote controller does not have LCD display.
                         isOn = false;
                         break;
 
-                    case ConstValue.BIRGuiDisplayType_ALWAYS:   // has always on display
+                    case AlwaysOn:   // has always on display
                         // this kind of remote controller does not maintain the power on/off state,
                         // power on/off sends out the same IR signal (so it's toggle type). Thus the power
                         // state is maintained by the air conditioner itself, not in the remote controller.
@@ -433,8 +432,7 @@ public class AcDemo2Activity extends AppCompatActivity {
                 So you should disable the the keys when power is off.
              */
             mCurrentTempText.setVisibility(isOn ? View.VISIBLE: View.INVISIBLE);
-            mTempUpButton.setEnabled(mHasTemperatureUpKey ? isOn : false);
-            mTempDownButton.setEnabled(mHasTemperatureDownKey ? isOn : false);
+            mTempBar.setEnabled(mHasTemperatureKey ? isOn : false);
             mCurrentModeText.setVisibility(isOn ? View.VISIBLE: View.INVISIBLE);
             mModeButton.setEnabled(mHasModeKey ? isOn : false);
             mCurrentFanSpeedText.setVisibility(isOn ? View.VISIBLE: View.INVISIBLE);
@@ -451,9 +449,62 @@ public class AcDemo2Activity extends AppCompatActivity {
     }
 
     // temperature key GUI
-    private void showTempText(String currentTempOption) {
+    private void updateTempGUI(ACKeyOptions tempKeyOptions) {
 
+        // get the min/max temp
+        int minTemp = 100;
+        int maxTemp = -100;
+        int currentTemp;
+        String currentTempOption = tempKeyOptions.options[tempKeyOptions.currentOption];
         String tempString = extractTempStringFromOptionString(currentTempOption);
+
+        if (tempString.startsWith("P") || tempString.startsWith("N")) {
+
+            currentTemp = Integer.parseInt(tempString.substring(1));
+            if (tempString.startsWith("N")) {
+                currentTemp *= (-1);
+            }
+
+            int temp;
+            for (String optionId : tempKeyOptions.options) {
+                try {
+                    tempString = extractTempStringFromOptionString(optionId);
+                    temp = Integer.parseInt(tempString.substring(1));
+                    if (tempString.startsWith("N")) {
+                        temp *= (-1);
+                    }
+
+                    if (temp > maxTemp) {
+                        maxTemp = temp;
+                    }
+                    if (temp < minTemp) {
+                        minTemp = temp;
+                    }
+                } catch (Exception e) {
+
+                }
+            }
+        } else {
+            currentTemp = Integer.parseInt(tempString);
+
+            int temp;
+            for (String optionId : tempKeyOptions.options) {
+                try {
+                    temp = Integer.parseInt(extractTempStringFromOptionString(optionId));
+                    if (temp > maxTemp) {
+                        maxTemp = temp;
+                    }
+                    if (temp < minTemp) {
+                        minTemp = temp;
+                    }
+                } catch (Exception e){
+                }
+            }
+        }
+        mMinTemp = minTemp;
+        mMaxTemp = maxTemp;
+        mTempBar.setMax(maxTemp - minTemp);
+        mTempBar.setProgress(currentTemp - minTemp);
 
         try {
             int temp = Integer.parseInt(tempString);
@@ -530,4 +581,3 @@ public class AcDemo2Activity extends AppCompatActivity {
         return newList.toArray(new String[newList.size()]);
     }
 }
-
